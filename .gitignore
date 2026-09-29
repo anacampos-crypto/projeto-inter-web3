@@ -1,6 +1,7 @@
 # Foundry build outputs
 out/
 cache/
+/lib/
 
 # Environment secrets
 .env
