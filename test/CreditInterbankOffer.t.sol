@@ -3,7 +3,7 @@ pragma solidity ^0.8.24;
 
 import {Test} from "forge-std/Test.sol";
 import {IAccessControl} from "@openzeppelin/contracts/access/IAccessControl.sol";
-import {IERC20Errors} from "@openzeppelin/contracts/interfaces/draft-IERC6093.sol";
+import {IERC20Errors, IERC721Errors} from "@openzeppelin/contracts/interfaces/draft-IERC6093.sol";
 
 import {CreditInterbankOffer} from "../src/CreditInterbankOffer.sol";
 import {ICreditInterbankOffer} from "../src/interfaces/ICreditInterbankOffer.sol";
@@ -414,7 +414,51 @@ contract CreditInterbankOfferTest is Test {
         position.mint(lender, 1);
     }
 
+    function test_PositionToken_OnlyOfferContractCanBurn() public {
+        uint256 offerId = _createDefaultOffer();
+        vm.prank(borrower);
+        offerContract.acceptOffer(offerId);
+
+        bytes32 minterRole = position.MINTER_ROLE();
+        vm.prank(lender);
+        vm.expectRevert(
+            abi.encodeWithSelector(IAccessControl.AccessControlUnauthorizedAccount.selector, lender, minterRole)
+        );
+        position.burn(offerId);
+    }
+
+    function test_PositionToken_MinterCanBurn() public {
+        uint256 offerId = _createDefaultOffer();
+        vm.prank(borrower);
+        offerContract.acceptOffer(offerId);
+
+        vm.prank(address(offerContract));
+        position.burn(offerId);
+
+        assertEq(position.balanceOf(lender), 0);
+        vm.expectRevert(abi.encodeWithSelector(IERC721Errors.ERC721NonexistentToken.selector, offerId));
+        position.ownerOf(offerId);
+    }
+
     function test_BRLToken_HasTwoDecimals() public view {
         assertEq(brl.decimals(), 2);
+    }
+
+    function test_BRLToken_OnlyMinterCanMint() public {
+        bytes32 minterRole = brl.MINTER_ROLE();
+        vm.prank(lender);
+        vm.expectRevert(
+            abi.encodeWithSelector(IAccessControl.AccessControlUnauthorizedAccount.selector, lender, minterRole)
+        );
+        brl.mint(lender, AMOUNT);
+    }
+
+    function test_BRLToken_AdminCanMint() public {
+        uint256 supplyBefore = brl.totalSupply();
+        vm.prank(admin);
+        brl.mint(outsider, AMOUNT);
+
+        assertEq(brl.balanceOf(outsider), AMOUNT);
+        assertEq(brl.totalSupply(), supplyBefore + AMOUNT);
     }
 }
