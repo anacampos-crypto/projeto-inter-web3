@@ -4,3 +4,7 @@ cache/
 
 # Environment secrets
 .env
+
+# Deploys locais (Anvil) mudam a cada execução
+deployments/local.json
+broadcast/*/31337/
