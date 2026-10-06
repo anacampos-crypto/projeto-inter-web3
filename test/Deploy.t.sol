@@ -25,10 +25,16 @@ contract DeployTest is Test {
         assertEq(cfg.institutions[0].wallet, 0x70997970C51812dc3A010C7d01b50e0d17dc79C8);
         assertEq(cfg.institutions[0].creditLimit, 500000000);
         assertEq(cfg.institutions[0].brlMint, 1000000000);
+        // As carteiras precisam ser as contas 1, 2 e 3 do Anvil, senão o deploy local
+        // cadastra endereços sem chave conhecida.
+        assertEq(cfg.institutions[1].wallet, 0x3C44CdDdB6a900fa2b585dd299e03d12FA4293BC);
+        assertEq(cfg.institutions[2].wallet, 0x90F79bf6EB2c4f870365E785982E1f101E93b906);
     }
 
     function test_LoadConfig_AcceptsEmptyInstitutionList() public view {
-        Deploy.Config memory cfg = script.loadConfig(string.concat(vm.projectRoot(), "/script/config/sepolia.json"));
+        // Usa um arquivo de teste: o sepolia.json real recebe as carteiras das instituições.
+        Deploy.Config memory cfg =
+            script.loadConfig(string.concat(vm.projectRoot(), "/test/fixtures/empty-institutions.json"));
         assertEq(cfg.chainId, 11155111);
         assertEq(cfg.institutions.length, 0);
     }
