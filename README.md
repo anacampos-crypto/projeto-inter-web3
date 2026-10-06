@@ -14,13 +14,19 @@ crédito interfinanceiro overnight em ambiente de testes.
 | `src/tokens/CDIPositionToken.sol` | NFT de posição CDI (ERC-721, mint restrito ao contrato de ofertas) — perna do ativo |
 | `script/Deploy.s.sol` | Deploy parametrizado por ambiente (ver [Deploy](#deploy)) |
 | `script/config/*.json` | Configuração de cada ambiente de deploy (rede, admin, instituições) |
-| `deployments/*.json` | Endereços gerados por cada deploy |
-| `test/CreditInterbankOffer.t.sol` | Suíte Foundry |
+| `deployments/*.json` | Endereços gerados por cada deploy (a pasta é criada no primeiro deploy) |
+| `test/CreditInterbankOffer.t.sol` | Testes do protocolo: ciclo da oferta, DvP, permissões e erros |
+| `test/CreditInterbankOfferEdgeCases.t.sol` | Testes de falha e borda: limites exatos, fronteira da validade, reentrância e estados finais |
+| `test/Deploy.t.sol` | Testes do script de deploy |
+| `test/fixtures/` | Arquivos de configuração usados só nos testes |
+| `broadcast/` | Registro das transações de cada deploy feito com `--broadcast` |
+| `.env.example` | Modelo das variáveis de ambiente para a Sepolia |
 
 ## Entregas
 
 - **Semana 1 (14/09–20/09):** máquina de estados, interface e projeto Foundry.
 - **Semana 2:** token CDI, contrato de liquidação DvP e testes do caminho feliz.
+- **Semana 3:** testes de falha e borda, script de deploy parametrizado por ambiente e primeiro deploy verificado na Sepolia.
 
 ## Fluxo
 
@@ -41,6 +47,36 @@ crédito interfinanceiro overnight em ambiente de testes.
 `Offered`, a oferta também pode seguir para `Cancelled` (pelo ofertante),
 `Rejected` (pelo tomador) ou `Expired` (após `expiresAt`). Todos os estados,
 exceto `Offered`, são finais. Detalhes em `docs/maquina-estados-oferta.md`.
+
+## Contratos na Sepolia
+
+Implantados e verificados no Etherscan em 05/10/2026 (bloco 11852305). Os
+endereços também ficam em `deployments/sepolia.json`.
+
+| Contrato | Endereço |
+| --- | --- |
+| `CreditInterbankOffer` | [`0x2401d88D300dD2CEdB83337bba9Ba29E7269079A`](https://sepolia.etherscan.io/address/0x2401d88D300dD2CEdB83337bba9Ba29E7269079A#code) |
+| `BRLToken` | [`0x9591db5fa1345Cc12e7b8F747a3DdAeecc83d25D`](https://sepolia.etherscan.io/address/0x9591db5fa1345Cc12e7b8F747a3DdAeecc83d25D#code) |
+| `CDIPositionToken` | [`0xae1C70253946E2a4Cf42c1C979ABD9E8d76AE3c7`](https://sepolia.etherscan.io/address/0xae1C70253946E2a4Cf42c1C979ABD9E8d76AE3c7#code) |
+
+Admin: `0x90FC17b6A24A9cBbb984975a6Ea588b063470695`. Instituições cadastradas no
+deploy (ver `script/config/sepolia.json`): duas com limite de R$ 5 mi e R$ 10 mi
+em BRLt, e uma cadastrada sem limite.
+
+### Demonstração on-chain
+
+Primeira operação liquidada na Sepolia: oferta nº 1, R$ 1.000.000,00 a 100% do
+CDI, overnight, do banco A (`0xf43E…94e9`) para o banco B (`0x38a1…aAFF`).
+
+| Etapa | Transação |
+| --- | --- |
+| `approve` do BRLt pelo ofertante | [`0xac5f8c4b…`](https://sepolia.etherscan.io/tx/0xac5f8c4b2678129920ef2c91fb677d6c4d3324dc62dc9d63afe23934ecfeb3aa) |
+| `createOffer` | [`0x1fcfa5db…`](https://sepolia.etherscan.io/tx/0x1fcfa5db23515922b644a39fa15cec2dc7203a5d01dddbda212025f6a911467d) |
+| `acceptOffer` (liquidação DvP) | [`0xe503d1c3…`](https://sepolia.etherscan.io/tx/0xe503d1c3f1dddf19cb0de517e291be9b8be34539c0963243414899782658084f) |
+
+A transação de aceite mostra, no mesmo bloco, a transferência de 1.000.000,00
+BRLt do banco A para o banco B e a emissão do NFT de posição nº 1 para o banco A,
+além dos eventos `OfferAccepted` e `OfferSettled`.
 
 ## Como validar
 
@@ -111,9 +147,12 @@ DEPLOY_ENV=local forge script script/Deploy.s.sol --rpc-url local --broadcast \
 4. Simule sem `--broadcast` e, se estiver tudo certo, implante e verifique:
 
 ```bash
-DEPLOY_ENV=sepolia forge script script/Deploy.s.sol --rpc-url sepolia --account deployer
-DEPLOY_ENV=sepolia forge script script/Deploy.s.sol --rpc-url sepolia --account deployer --broadcast --verify
+DEPLOY_ENV=sepolia forge script script/Deploy.s.sol --rpc-url sepolia --account deployer --sender <endereço do deployer>
+DEPLOY_ENV=sepolia forge script script/Deploy.s.sol --rpc-url sepolia --account deployer --sender <endereço do deployer> --broadcast --verify
 ```
+
+Sem `--broadcast`, o Foundry não abre o keystore; por isso o `--sender` é
+necessário para a simulação saber qual conta é o deployer.
 
 ### Após o deploy
 
