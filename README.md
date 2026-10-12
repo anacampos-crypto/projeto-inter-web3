@@ -8,6 +8,7 @@ crédito interfinanceiro overnight em ambiente de testes.
 | Caminho | Conteúdo |
 | --- | --- |
 | `docs/maquina-estados-oferta.md` | Especificação da máquina de estados da oferta (estados, gatilhos, guardas, invariantes) |
+| `docs/guia-integracao.md` | Guia de integração para backend e frontend: funções, eventos, erros e unidades |
 | `src/interfaces/ICreditInterbankOffer.sol` | Interface: modelo de dados, eventos, erros e funções |
 | `src/CreditInterbankOffer.sol` | Contrato de ofertas com cadastro de instituições, limite de crédito e liquidação DvP |
 | `src/tokens/BRLToken.sol` | Real tokenizado fictício (ERC-20, 2 casas decimais, mint restrito) — perna financeira |
