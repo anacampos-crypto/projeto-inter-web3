@@ -12,6 +12,8 @@ crédito interfinanceiro overnight em ambiente de testes.
 | `src/CreditInterbankOffer.sol` | Contrato de ofertas com cadastro de instituições, limite de crédito e liquidação DvP |
 | `src/tokens/BRLToken.sol` | Real tokenizado fictício (ERC-20, 2 casas decimais, mint restrito) — perna financeira |
 | `src/tokens/CDIPositionToken.sol` | NFT de posição CDI (ERC-721, mint restrito ao contrato de ofertas) — perna do ativo |
+| `abi/` | ABIs versionadas dos três contratos, para o backend e o frontend importarem (ver `abi/README.md`) |
+| `script/export-abi.sh` | Regenera as ABIs em `abi/` a partir de `src/` |
 | `script/Deploy.s.sol` | Deploy parametrizado por ambiente (ver [Deploy](#deploy)) |
 | `script/config/*.json` | Configuração de cada ambiente de deploy (rede, admin, instituições) |
 | `deployments/*.json` | Endereços gerados por cada deploy (a pasta é criada no primeiro deploy) |
