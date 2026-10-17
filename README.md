@@ -24,12 +24,15 @@ crédito interfinanceiro overnight em ambiente de testes.
 | `test/fixtures/` | Arquivos de configuração usados só nos testes |
 | `broadcast/` | Registro das transações de cada deploy feito com `--broadcast` |
 | `.env.example` | Modelo das variáveis de ambiente para a Sepolia |
+| `CHANGELOG.md` | O que entrou em cada versão do protocolo |
 
 ## Entregas
 
 - **Semana 1 (14/09–20/09):** máquina de estados, interface e projeto Foundry.
 - **Semana 2:** token CDI, contrato de liquidação DvP e testes do caminho feliz.
 - **Semana 3:** testes de falha e borda, script de deploy parametrizado por ambiente e primeiro deploy verificado na Sepolia.
+- **Semana 4:** ABIs versionadas em `abi/` e guia de integração para backend e frontend.
+- **Semana 5 (17/10):** release `v1.0.0`, que congela contratos, ABIs e endereços da Sepolia (ver `CHANGELOG.md`).
 
 ## Fluxo
 
@@ -81,6 +84,29 @@ A transação de aceite mostra, no mesmo bloco, a transferência de 1.000.000,00
 BRLt do banco A para o banco B e a emissão do NFT de posição nº 1 para o banco A,
 além dos eventos `OfferAccepted` e `OfferSettled`.
 
+## Integração com backend e frontend
+
+Os repositórios de backend e frontend não dependem do código deste repositório:
+o ponto de encontro são os contratos implantados na Sepolia. Para falar com
+eles, cada time precisa de dois artefatos, que devem ser copiados a partir da
+tag `v1.0.0` (e não do `main`):
+
+| Artefato | Para quê |
+| --- | --- |
+| `abi/*.json` | Montar as chamadas e decodificar eventos e erros (ethers, viem ou web3.js) |
+| `deployments/sepolia.json` | Endereços dos contratos, `chainId` e bloco inicial para ler eventos (`startBlock`) |
+
+- **Backend:** escuta os eventos do `CreditInterbankOffer` a partir do
+  `startBlock`, guarda o histórico e executa as funções de admin (cadastro de
+  instituições e limites).
+- **Frontend:** monta as transações que a carteira de cada banco assina
+  (`approve` no BRLt, `createOffer`, `acceptOffer`, `rejectOffer`,
+  `cancelOffer`) e mostra o status com `getOfferStatus`.
+
+Unidades, pré-requisitos, eventos e erros estão em `docs/guia-integracao.md`.
+Se um contrato mudar, as ABIs são regeneradas com `bash script/export-abi.sh`
+e uma nova tag é criada; os outros times atualizam a cópia a partir dela.
+
 ## Como validar
 
 Requer [Foundry](https://book.getfoundry.sh/getting-started/installation). As
@@ -92,7 +118,7 @@ forge build
 forge test -vv
 ```
 
-Todos os testes da suíte devem passar.
+Todos os testes da suíte devem passar (64 testes na `v1.0.0`).
 
 ## Deploy
 
