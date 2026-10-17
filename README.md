@@ -84,6 +84,19 @@ A transação de aceite mostra, no mesmo bloco, a transferência de 1.000.000,00
 BRLt do banco A para o banco B e a emissão do NFT de posição nº 1 para o banco A,
 além dos eventos `OfferAccepted` e `OfferSettled`.
 
+### Carteiras de teste
+
+Instituições cadastradas pelo admin depois do deploy, para os testes de
+integração do frontend. Cada uma recebeu limite de R$ 5 mi e R$ 10 mi em BRLt.
+
+| Carteira | Uso | Cadastro | Limite | BRLt |
+| --- | --- | --- | --- | --- |
+| `0x6E9A99940F0Dda1facF350d8EC75eEcb1c16Ae11` | Testes do frontend | [`0x11b48adf…`](https://sepolia.etherscan.io/tx/0x11b48adfabe5f55326ec3f98f738ed8c4ad7234bced3c3240213f94b8ce77275) | [`0x59f0dfb6…`](https://sepolia.etherscan.io/tx/0x59f0dfb66ca9fcccd678b7b39bec2ca78363a7e72b6543d295bf43cbe7881de6) | [`0xc9c086bf…`](https://sepolia.etherscan.io/tx/0xc9c086bf139a911cc2e52598de60509bcb97fa1ffa4134a609da1a92da821bf6) |
+
+Para cadastrar outra carteira, o admin roda `registerInstitution`,
+`setCreditLimit` e, se a carteira for ofertar, `mint` no `BRLToken`. Essas
+carteiras não entram em `script/config/sepolia.json`, que descreve só o deploy.
+
 ## Integração com backend e frontend
 
 Os repositórios de backend e frontend não dependem do código deste repositório:
