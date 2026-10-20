@@ -92,6 +92,7 @@ integração do frontend. Cada uma recebeu limite de R$ 5 mi e R$ 10 mi em BRLt.
 | Carteira | Uso | Cadastro | Limite | BRLt |
 | --- | --- | --- | --- | --- |
 | `0x6E9A99940F0Dda1facF350d8EC75eEcb1c16Ae11` | Testes do frontend | [`0x11b48adf…`](https://sepolia.etherscan.io/tx/0x11b48adfabe5f55326ec3f98f738ed8c4ad7234bced3c3240213f94b8ce77275) | [`0x59f0dfb6…`](https://sepolia.etherscan.io/tx/0x59f0dfb66ca9fcccd678b7b39bec2ca78363a7e72b6543d295bf43cbe7881de6) | [`0xc9c086bf…`](https://sepolia.etherscan.io/tx/0xc9c086bf139a911cc2e52598de60509bcb97fa1ffa4134a609da1a92da821bf6) |
+| `0xdCd4a4994cB4a1d545ec6dbF8AD6e0828e73A3b0` | Testes do frontend (segunda carteira) | [`0x971e0306…`](https://sepolia.etherscan.io/tx/0x971e0306389f4d933880cb696c164e771df6f2adf49c406b572b26e5ad3ec90a) | [`0xa96d6859…`](https://sepolia.etherscan.io/tx/0xa96d685935b9b7fe818f245e38b0c380e731586b9a33fe2440168b67388cddc7) | [`0x14de2a3d…`](https://sepolia.etherscan.io/tx/0x14de2a3d5c5acce836dc717095b2c3a92a35563fd1ae2f56e6c75e305af30c54) |
 
 Para cadastrar outra carteira, o admin roda `registerInstitution`,
 `setCreditLimit` e, se a carteira for ofertar, `mint` no `BRLToken`. Essas
